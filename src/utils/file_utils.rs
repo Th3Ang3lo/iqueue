@@ -48,7 +48,11 @@ impl FileUtils {
 
     pub fn file_exists(file_path: &str) -> Option<bool> {
         let metadata = fs::metadata(file_path);
+        
+        if metadata.unwrap().is_file() {
+            return Some(true);
+        }
 
-        Some(metadata.unwrap().is_file())
+        None
     }
 }
