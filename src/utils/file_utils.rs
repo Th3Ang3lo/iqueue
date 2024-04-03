@@ -1,7 +1,5 @@
-use std::fs::{self, File, OpenOptions};
-use std::io::{Read, Write};
-
-use std::io::Error;
+use std::fs::{self, OpenOptions};
+use std::io::{Write, Error};
 
 pub struct FileUtils;
 
@@ -17,44 +15,40 @@ impl FileUtils {
             }
         }
 
-        let file_result = OpenOptions::new()
+        let mut file = OpenOptions::new()
             .create(true)
             .write(true)
             .append(true)
-            .open(file_path);
-
-        if let Err(err) = file_result {
-            return Err(err);
-        }
-
-        let mut file = file_result.unwrap();
+            .open(file_path)?;
 
         if let Err(err) = writeln!(file, "{}", content) {
             eprintln!("Couldn't write to file: {}", err);
         }
 
-        return Ok(true);
+        Ok(true)
     }
 
-    pub fn delete_file(file_path: &str) -> Result<(), Error> {
-        return fs::remove_file(file_path);
+    pub fn delete_file(file_path: &str) -> Option<bool> {
+        let file_exists = FileUtils::file_exists(file_path)?;
+
+        if file_exists {
+            fs::remove_file(file_path);
+
+            return Some(true);
+        }
+
+        None
     }
 
     pub fn read_file_as_string(file_path: &str) -> Result<String, Error> {
-        let file = fs::read_to_string(file_path);
+        let file_content = fs::read_to_string(file_path)?;
 
-        if let Err(err) = file {
-            panic!("Error opening file: {}", err);
-        }
-
-        return Ok(file.unwrap());
+        Ok(file_content)
     }
 
     pub fn file_exists(file_path: &str) -> Option<bool> {
-        if let Ok(metadata) = fs::metadata(file_path) {
-            return Some(metadata.is_file());
-        }
+        let metadata = fs::metadata(file_path);
 
-        return None;
+        Some(metadata.unwrap().is_file())
     }
 }
