@@ -16,8 +16,6 @@ impl StoreMessageUtils {
             channel
         );
 
-        println!("{}", queue_log_file_path);
-
         let current_timestamp_result = TimeUtils::get_current_unix_timestamp();
 
         if let Err(err) = current_timestamp_result {
@@ -38,8 +36,6 @@ impl StoreMessageUtils {
                 queue_log_file_path.as_str(),
                 queue_string_result.unwrap().as_str(),
             );
-
-            return Ok(true);
 
             if append_on_queue_result.is_ok() {
                 return Ok(true);
