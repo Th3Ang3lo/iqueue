@@ -7,6 +7,16 @@ pub struct FileUtils;
 
 impl FileUtils {
     pub fn append(file_path: &str, content: &str) -> Result<bool, Error> {
+        if let Some(parent_dir) = std::path::Path::new(&file_path).parent() {
+            if !parent_dir.exists() {
+                if let Err(err) = fs::create_dir_all(parent_dir) {
+                    eprintln!("Erro ao criar o diretório: {}", err);
+
+                    return Err(err);
+                }
+            }
+        }
+
         let file_result = OpenOptions::new()
             .create(true)
             .write(true)

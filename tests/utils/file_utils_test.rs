@@ -36,7 +36,11 @@ mod store_message_utils_test {
 
         let current_timestamp = current_timestamp.unwrap();
 
-        let file = format!("{}/tests/files/{}_to_append.txt", cwd.to_string_lossy(), current_timestamp);
+        let file = format!(
+            "{}/tests/files/{}_to_append.txt",
+            cwd.to_string_lossy(),
+            current_timestamp
+        );
 
         let file_appended_result = FileUtils::append(file.as_str(), "test");
 
@@ -61,7 +65,11 @@ mod store_message_utils_test {
 
         let current_timestamp = current_timestamp.unwrap();
 
-        let file = format!("{}/tests/files/{}_to_delete.txt", cwd.to_string_lossy(), current_timestamp);
+        let file = format!(
+            "{}/tests/files/{}_to_delete.txt",
+            cwd.to_string_lossy(),
+            current_timestamp
+        );
 
         let file_appended_result = FileUtils::append(file.as_str(), "test");
         assert!(file_appended_result.is_ok());
