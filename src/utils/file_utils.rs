@@ -3,8 +3,15 @@ use std::io::{Write, Error};
 
 pub struct FileUtils;
 
-impl FileUtils {
-    pub fn append(file_path: &str, content: &str) -> Result<bool, Error> {
+pub trait FileUtilsImpl {
+    fn file_exists(file_path: &str) -> Option<bool>;
+    fn read_file_as_string(file_path: &str) -> Result<String, Error>;
+    fn delete_file(file_path: &str) -> Option<bool>;
+    fn append(file_path: &str, content: &str) -> Result<bool, Error>;
+}
+
+impl FileUtilsImpl for FileUtils {
+    fn append(file_path: &str, content: &str) -> Result<bool, Error> {
         if let Some(parent_dir) = std::path::Path::new(&file_path).parent() {
             if !parent_dir.exists() {
                 if let Err(err) = fs::create_dir_all(parent_dir) {
@@ -28,11 +35,11 @@ impl FileUtils {
         Ok(true)
     }
 
-    pub fn delete_file(file_path: &str) -> Option<bool> {
-        let file_exists = FileUtils::file_exists(file_path)?;
+    fn delete_file(file_path: &str) -> Option<bool> {
+        let file_exists = <FileUtils as FileUtilsImpl>::file_exists(file_path)?;
 
         if file_exists {
-            fs::remove_file(file_path);
+            let _ = fs::remove_file(file_path);
 
             return Some(true);
         }
@@ -40,13 +47,13 @@ impl FileUtils {
         None
     }
 
-    pub fn read_file_as_string(file_path: &str) -> Result<String, Error> {
+    fn read_file_as_string(file_path: &str) -> Result<String, Error> {
         let file_content = fs::read_to_string(file_path)?;
 
         Ok(file_content)
     }
 
-    pub fn file_exists(file_path: &str) -> Option<bool> {
+    fn file_exists(file_path: &str) -> Option<bool> {
         let metadata = fs::metadata(file_path);
         
         if metadata.unwrap().is_file() {

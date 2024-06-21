@@ -1,12 +1,18 @@
 use std::io::{Error, ErrorKind};
 
 use crate::types::store_message_utils_type::MessageStoreFormat;
-use crate::utils::{file_utils::FileUtils, time_utils::TimeUtils};
+use crate::utils::{file_utils::FileUtilsImpl, time_utils::TimeUtils};
+
+use super::file_utils::FileUtils;
 
 pub struct StoreMessageUtils;
 
-impl StoreMessageUtils {
-    pub fn store_message(channel: &str, data: &str) -> Result<bool, Error> {
+pub trait StoreMessageUtilsImpl {
+    fn store_message(channel: &str, data: &str) -> Result<bool, Error>;
+}
+
+impl StoreMessageUtilsImpl for StoreMessageUtils {
+    fn store_message(channel: &str, data: &str) -> Result<bool, Error> {
         let cwd = std::env::current_dir()?;
 
         let queue_log_file_path = format!(
@@ -29,7 +35,7 @@ impl StoreMessageUtils {
         };
 
         let queue_string_result = serde_json::to_string(&data)?;
-        let append_on_queue = FileUtils::append(
+        let append_on_queue = <FileUtils as FileUtilsImpl>::append(
             queue_log_file_path.as_str(),
             queue_string_result.as_str(),
         )?;
